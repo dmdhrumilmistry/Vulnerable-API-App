@@ -1,8 +1,7 @@
-from sqlalchemy import delete
 from models import db
 from flask import request, jsonify, make_response
 from flask_restful import Resource
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 from models import UserModel
 
 
@@ -56,9 +55,12 @@ class UsersView(Resource):
         return make_response(jsonify(message), status_code)
 
 # for specific user
+
+
 class UserView(Resource):
+    # vulnerable : exposes user data when appropriate header is passed
     def get(self, id: int):
-        # if request header has Hide-Info header as 1 disclose sensitive information for that user
+        # if request header has Hide-Info header as 0 disclose sensitive information for that user
         hide_sensitive_info = request.headers.get('Hide-Info', 1, type=int)
         hide_sensitive_info = bool(hide_sensitive_info)
 
@@ -83,6 +85,34 @@ class UserView(Resource):
             db.session.delete(user)
             db.session.commit()
             message = {'message': 'user deleted'}
+            status_code = 200
+
+        return make_response(jsonify(message), status_code)
+
+
+class AdminView(Resource):
+    def __check_user(self):
+        id = request.headers.get('AdminId', -1)
+        auth_token = request.headers.get(
+            'Authorization', '').removeprefix('Bearer').strip()
+        print(id, auth_token)
+
+        admin: UserModel = UserModel.query.filter_by(id=id).first()
+        if admin:
+            print(admin.jwt_token)
+            if admin.jwt_token == auth_token:
+                print('valid')
+                return True
+
+        return False
+
+    @jwt_required()
+    def get(self, id):
+        message = {'auth': 'failed'}
+        status_code = 401
+
+        if self.__check_user():
+            message = {'auth': 'success'}
             status_code = 200
 
         return make_response(jsonify(message), status_code)
