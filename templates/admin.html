@@ -1,0 +1,60 @@
+{% extends "index.html" %}
+
+{% block section%}
+<script type="text/javascript">
+    async function executeCommand() {
+        // get command
+        const command = document.getElementById('command').value;
+
+        // get output div
+        let outputDiv = document.getElementById('output');
+
+        // execute command
+        axios({
+            url: '/api/admin',
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            data: {
+                'command': command
+            }
+        })
+            .then(response => {
+                if (response.status == 200) {
+                    outputDiv.innerText = response.data.response;
+                } else {
+                    outputDiv.innerText = response.data;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            })
+
+    }
+</script>
+<div class="container p-3">
+    <ul>
+        <ul class="p-3">
+            <div class="fs-2 fw-bold text-center">Execute Commands</div>
+        </ul>
+        <ul class="p-3">
+            <div class="input-group mb-3">
+                <input id="command" type="text" class="form-control" placeholder="Recipient's username"
+                    aria-label="Recipient's username" aria-describedby="button-addon2">
+                <button class="btn btn-outline-secondary" type="button" id="executeBtn"
+                    onclick="executeCommand()">Execute</button>
+            </div>
+        </ul>
+        <ul>
+            <p class="p-2 fs-5 fw-bold">Output</p>
+            <div class="card">
+                <div id="output" class="card-body text-wrap text-start">
+                    ...
+                </div>
+            </div>
+        </ul>
+    </ul>
+</div>
+{% endblock section %}

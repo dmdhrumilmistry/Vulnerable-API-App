@@ -1,1 +1,79 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block body %}
+<link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet" />
+<div class="container text-center p-5">
+    <input id="token" value="{{token}}" hidden>
+    <script type="text/javascript">
+        let token = document.getElementById('token').value;
+
+        async function authenticateUser() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            let alertDiv = document.getElementById('alert');
+
+            axios
+                .post('/api/user/login', {
+                    'email': email,
+                    'password': password
+                })
+                .then((response) => {
+                    if (response.status == 200) {
+                        token = response.data.token;
+                        alertDiv.innerHTML = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Logged In Successfully!</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        `;
+                        window.location.href = `http://${window.location.host}/home?token=${token}`;
+                        console.log(window.location.hostname);
+                    } else if (response.status == 401) {
+                        alertDiv.innerHTML = `
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <strong>Invalid Email/Password!</strong> Please Try Again!!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        `;
+                    } else {
+                        alertDiv.innerHTML = `
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <strong>Something Went Wrong!</strong> Please Try Again Later!!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        `;
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alertDiv.innerHTML = `
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>Something Went Wrong!</strong> Please Try Again Later!!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                        `;
+                });
+        }
+    </script>
+    <main class="form-signin">
+        <form>
+            <h1 class="fs-3 fw-bold p-5">Vuln-API-APP</h1>
+            <h1 class="h4 mb-3 fw-normal">Please sign in</h1>
+
+            <div id="alert"></div>
+            <div class="form-floating py-2">
+                <input id="email" type="email" class="form-control" id="floatingInput"
+                    placeholder="username@vuln-api-app.com" />
+                <label for="floatingInput py-2">Email address</label>
+            </div>
+            <div class="form-floating py-2">
+                <input id="password" type="password" class="form-control" id="floatingPassword"
+                    placeholder="V3ry5Tr0n9P455w0rd" />
+                <label for="floatingPassword">Password</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" onclick="authenticateUser()" type="button">
+                Sign in
+            </button>
+            <p class="mt-5 mb-3 text-muted">&copy; dmdhrumilmistry 2022</p>
+        </form>
+    </main>
+</div>
+{% endblock body %}

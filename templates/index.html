@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% block body %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/"><strong>Vuln-API-App</strong></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="/home">Home</a>
+        </li>
+        <li id="admin-control-tab" class="nav-item">
+          <a class="nav-link" aria-current="page" href="/admin">Admin Controls</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<input id="token" value="{{token}}" hidden>
+<script type="text/javascript">
+  const token = document.getElementById('token').value;
+  let url = window.location.href;
+  let is_admin = null;
+
+  function removeParam(key, sourceURL) {
+    var rtn = sourceURL.split("?")[0],
+      param,
+      params_arr = [],
+      queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    if (queryString !== "") {
+      params_arr = queryString.split("&");
+      for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+        param = params_arr[i].split("=")[0];
+        if (param === key) {
+          params_arr.splice(i, 1);
+        }
+      }
+      if (params_arr.length) rtn = rtn + "?" + params_arr.join("&");
+    }
+    window.history.pushState('', document.title, rtn);
+  }
+
+  // remove admin controls
+  function removeControls() {
+    let controlTab = document.getElementById('admin-control-tab');
+
+    axios({
+      url: '/api/user/getDetails',
+      method: 'get',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => {
+        if (response.status == 200) {
+          if (response.data.admin === false) {
+            controlTab.innerHTML = '';
+          }
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      })
+
+  }
+  removeParam('token', url);
+  removeControls();
+
+</script>
+{% block section %} {% endblock section %} {% endblock body %}

@@ -14,7 +14,7 @@ class UserModel(db.Model):
     jwt_token = db.Column('token', db.String(300), unique=True)
     is_admin = db.Column('admin', db.Boolean, default=False)
 
-    def __init__(self, first_name, last_name, email, password, jwt_token, is_admin) -> None:
+    def __init__(self, first_name, last_name, email, password, jwt_token, is_admin:bool = False) -> None:
         self.first_name: str = first_name
         self.last_name: str = last_name
         self.email: str = email
