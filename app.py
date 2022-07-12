@@ -205,4 +205,4 @@ api.add_resource(UserView, '/api/user/<int:id>')  # vulnerable
 api.add_resource(AdminView, '/api/admin')
 
 if __name__ == '__main__':
-    app.run('localhost', 3000)
+    app.run('0.0.0.0', 5000, debug=True)

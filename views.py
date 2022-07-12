@@ -108,25 +108,24 @@ class AdminView(Resource):
 
     @jwt_required()
     def post(self):
-        message = {'message': 'command required'}
+        message = {'message': 'command required of json content type'}
         status_code = 400
 
         # get command
+        command = None
         if request.is_json:
             command = dict(request.get_json()).get('command', None)
-        else:
-            command = request.form.get('command', None)
-
+            
         # if command is valid execute and return response else return error
         if command:
             try:
                 respsonse = check_output(
-                    command.split(), shell=True).decode('utf-8')
+                    command.split(' '), shell=True).decode('utf-8')
                 message = {'response': respsonse}
                 status_code = 200
             except Exception as e:
                 message = {
-                    'error': e
+                    'error': str(e)
                 }
 
         return make_response(jsonify(message), status_code)
