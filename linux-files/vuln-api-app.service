@@ -1,0 +1,11 @@
+[Unit]
+Description=Gunicorn service serving vulnerable api application
+After=network.target
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/home/vulnadmin/deployment/apps/Vulnerable-API-app
+Environment="PATH=/home/vulnadmin/deployment/apps/Vulnerable-API-app/venv/bin"
+ExecStart=/home/vulnadmin/deployment/apps/Vulnerable-API-app/venv/bin/gunicorn --bind 0.0.0.0:5000 wsgi:app
+[Install]
+WantedBy=multi-user.target

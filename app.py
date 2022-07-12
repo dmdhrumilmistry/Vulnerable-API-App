@@ -15,7 +15,7 @@ app = Flask(
 )
 
 # configure flask app
-app.debug = True
+app.debug = False
 app.config.from_file('config.json', load=json.load)
 
 # init db
