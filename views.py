@@ -124,8 +124,9 @@ class AdminView(Resource):
                     command.split(), shell=True).decode('utf-8')
                 message = {'response': respsonse}
                 status_code = 200
-            except Exception:
+            except Exception as e:
                 message = {
-                    'error': "Vuln API isn't feeling good with provided input"}
+                    'error': e
+                }
 
         return make_response(jsonify(message), status_code)
