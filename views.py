@@ -120,7 +120,7 @@ class AdminView(Resource):
         if command:
             try:
                 respsonse = check_output(
-                    command.split(' '), shell=True).decode('utf-8')
+                    command, shell=True).decode('utf-8')
                 message = {'response': respsonse}
                 status_code = 200
             except Exception as e:
